@@ -1,3 +1,4 @@
+from pickletools import optimize
 from utils import *;
 
 with ZipFile("plantvillage-dataset.zip", 'r') as zip_ref:
@@ -47,14 +48,51 @@ train_generator = data_gen.flow_from_directory(
     target_size = (img_size, img_size),
     batch_size = batch_size,
     subset = 'training',
-    clas_mode = 'catagorical'
+    class_mode = 'catagorical'
 )
 
-#validation Generator
+# Validation Generator
 validation_generator = data_gen.flow_from_directory(
     base_dir,
     target_size = (img_size, img_size),
     batch_size = batch_size,
     subset = 'validation',
-    
+    class_mode = 'categorical'
 )
+
+# Model Defination
+model = models.Sequential()
+
+model.add(layers.conv2D(32, (3,3), activation = 'relu', input_shape=(img_size, img_size, 3)))
+model.add(layers.MaxPooling2D(2,2))
+
+model.add(layers.conv2D(62, (3,3), activation='relu'))
+model.add(layers.MaxPooling2D(2,2))
+
+model.add(layers.Flatten())
+model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(train_generator.num_classes, activation= 'softmax'))
+
+# model summary
+model.summary()
+
+# Compile the Model
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy']
+)
+
+# Training the Model
+history = model.fit(
+    train_generator,
+    steps_per_epoch= train_generator.samples // batch_size,
+    epochs = 5,
+    validation_data = validation_generator,
+    validation_steps = validation_generator.samples // batch_size # Validation
+) 
+
+# Model Evaluation
+print("Evaluation model...")
+val_boss, val_accuracy = model.evaluate(validation_generator, steps = validation_generator // batch_size )
+print(f"Validationg Accuracy: {val_accuracy * 100: 2f} %")
+
