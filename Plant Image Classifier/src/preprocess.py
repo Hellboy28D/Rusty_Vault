@@ -96,3 +96,20 @@ print("Evaluation model...")
 val_boss, val_accuracy = model.evaluate(validation_generator, steps = validation_generator // batch_size )
 print(f"Validationg Accuracy: {val_accuracy * 100: 2f} %")
 
+# Plot training & validation accuracy values
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model accuracy')
+plt.ylable('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc = 'upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylable('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc = 'upper left')
+plt.show()
